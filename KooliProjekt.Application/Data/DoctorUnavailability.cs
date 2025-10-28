@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.ComponentModel.DataAnnotations;
 
 namespace KooliProjekt.Application.Data
 {
@@ -11,9 +12,12 @@ namespace KooliProjekt.Application.Data
     {
         [Key]
         public int UnavailabilityId { get; set; }
+        [Required] //Although int can't be nullable anyway
+        [ForeignKey("Doctor")]
         public int DoctorId { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
+        [MaxLength(200)]
         public string Reason { get; set; }
 
         //Navigation property
