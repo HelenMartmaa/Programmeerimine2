@@ -10,22 +10,22 @@ using KooliProjekt.Application.Infrastructure.Results;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace KooliProjekt.Application.Features.Administrator
+namespace KooliProjekt.Application.Features.Doctors
 {
-    public class ListAdministratorQueryHandler : IRequestHandler<ListAdministratorQuery, OperationResult<IList<KooliProjekt.Application.Data.Administrator>>>
+    public class ListDoctorsQueryHandler : IRequestHandler<ListDoctorsQuery, OperationResult<IList<KooliProjekt.Application.Data.Doctor>>>
     {
         private readonly ApplicationDbContext _dbContext;
-        public ListAdministratorQueryHandler(ApplicationDbContext dbContext)
+        public ListDoctorsQueryHandler(ApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
         }
 
-        public async Task<OperationResult<IList<KooliProjekt.Application.Data.Administrator>>> Handle(ListAdministratorQuery request, CancellationToken cancellationToken)
+        public async Task<OperationResult<IList<KooliProjekt.Application.Data.Doctor>>> Handle(ListDoctorsQuery request, CancellationToken cancellationToken)
         {
-            var result = new OperationResult<IList<KooliProjekt.Application.Data.Administrator>>();
+            var result = new OperationResult<IList<KooliProjekt.Application.Data.Doctor>>();
             result.Value = await _dbContext
-                .Administrators
-                .OrderBy(r => r.AdminId)
+                .Doctors
+                .OrderBy(r => r.DoctorId)
                 .ToListAsync(cancellationToken); //Allows the caller to cancel the ongoing query/operation
 
             return result;

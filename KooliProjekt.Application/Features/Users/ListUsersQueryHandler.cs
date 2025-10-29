@@ -10,22 +10,22 @@ using KooliProjekt.Application.Infrastructure.Results;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace KooliProjekt.Application.Features.Invoice
+namespace KooliProjekt.Application.Features.Users
 {
-    public class ListInvoiceQueryHandler : IRequestHandler<ListInvoiceQuery, OperationResult<IList<KooliProjekt.Application.Data.Invoice>>>
+    public class ListUsersQueryHandler : IRequestHandler<ListUsersQuery, OperationResult<IList<KooliProjekt.Application.Data.User>>>
     {
         private readonly ApplicationDbContext _dbContext;
-        public ListInvoiceQueryHandler(ApplicationDbContext dbContext)
+        public ListUsersQueryHandler(ApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
         }
 
-        public async Task<OperationResult<IList<KooliProjekt.Application.Data.Invoice>>> Handle(ListInvoiceQuery request, CancellationToken cancellationToken)
+        public async Task<OperationResult<IList<KooliProjekt.Application.Data.User>>> Handle(ListUsersQuery request, CancellationToken cancellationToken)
         {
-            var result = new OperationResult<IList<KooliProjekt.Application.Data.Invoice>>();
+            var result = new OperationResult<IList<KooliProjekt.Application.Data.User>>();
             result.Value = await _dbContext
-                .Invoices
-                .OrderBy(r => r.InvoiceId)
+                .Users
+                .OrderBy(u => u.LastName)
                 .ToListAsync(cancellationToken); //Allows the caller to cancel the ongoing query/operation
 
             return result;

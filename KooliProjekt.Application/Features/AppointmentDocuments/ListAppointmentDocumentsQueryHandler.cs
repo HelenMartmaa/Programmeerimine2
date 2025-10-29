@@ -10,17 +10,17 @@ using KooliProjekt.Application.Infrastructure.Results;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace KooliProjekt.Application.Features.AppointmentDocument
+namespace KooliProjekt.Application.Features.AppointmentDocuments
 {
-    public class ListAppointmentDocumentQueryHandler : IRequestHandler<ListAppointmentDocumentQuery, OperationResult<IList<KooliProjekt.Application.Data.AppointmentDocument>>>
+    public class ListAppointmentDocumentsQueryHandler : IRequestHandler<ListAppointmentDocumentsQuery, OperationResult<IList<KooliProjekt.Application.Data.AppointmentDocument>>>
     {
         private readonly ApplicationDbContext _dbContext;
-        public ListAppointmentDocumentQueryHandler(ApplicationDbContext dbContext)
+        public ListAppointmentDocumentsQueryHandler(ApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
         }
 
-        public async Task<OperationResult<IList<KooliProjekt.Application.Data.AppointmentDocument>>> Handle(ListAppointmentDocumentQuery request, CancellationToken cancellationToken)
+        public async Task<OperationResult<IList<KooliProjekt.Application.Data.AppointmentDocument>>> Handle(ListAppointmentDocumentsQuery request, CancellationToken cancellationToken)
         {
             var result = new OperationResult<IList<KooliProjekt.Application.Data.AppointmentDocument>>();
             result.Value = await _dbContext

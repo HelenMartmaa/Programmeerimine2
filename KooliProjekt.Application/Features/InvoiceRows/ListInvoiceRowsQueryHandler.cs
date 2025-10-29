@@ -10,17 +10,17 @@ using KooliProjekt.Application.Infrastructure.Results;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace KooliProjekt.Application.Features.InvoiceRow
+namespace KooliProjekt.Application.Features.InvoiceRows
 {
-    public class ListInvoiceRowQueryHandler : IRequestHandler<ListInvoiceRowQuery, OperationResult<IList<KooliProjekt.Application.Data.InvoiceRow>>>
+    public class ListInvoiceRowsQueryHandler : IRequestHandler<ListInvoiceRowsQuery, OperationResult<IList<KooliProjekt.Application.Data.InvoiceRow>>>
     {
         private readonly ApplicationDbContext _dbContext;
-        public ListInvoiceRowQueryHandler(ApplicationDbContext dbContext)
+        public ListInvoiceRowsQueryHandler(ApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
         }
 
-        public async Task<OperationResult<IList<KooliProjekt.Application.Data.InvoiceRow>>> Handle(ListInvoiceRowQuery request, CancellationToken cancellationToken)
+        public async Task<OperationResult<IList<KooliProjekt.Application.Data.InvoiceRow>>> Handle(ListInvoiceRowsQuery request, CancellationToken cancellationToken)
         {
             var result = new OperationResult<IList<KooliProjekt.Application.Data.InvoiceRow>>();
             result.Value = await _dbContext

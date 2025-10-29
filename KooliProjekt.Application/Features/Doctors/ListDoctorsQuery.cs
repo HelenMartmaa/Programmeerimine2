@@ -3,9 +3,9 @@ using KooliProjekt.Application.Data;
 using KooliProjekt.Application.Infrastructure.Results;
 using MediatR;
 
-namespace KooliProjekt.Application.Features.Client
+namespace KooliProjekt.Application.Features.Doctors
 {
-    public class ListClientQuery : IRequest<OperationResult<IList<KooliProjekt.Application.Data.Client>>>
+    public class ListDoctorsQuery : IRequest<OperationResult<IList<KooliProjekt.Application.Data.Doctor>>>
     {
     }
 }
