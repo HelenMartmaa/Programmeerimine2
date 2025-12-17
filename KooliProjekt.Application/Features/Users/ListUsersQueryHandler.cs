@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace KooliProjekt.Application.Features.Users
 {
-    public class ListUsersQueryHandler : IRequestHandler<ListUsersQuery, OperationResult<IList<KooliProjekt.Application.Data.User>>>
+    public class ListUsersQueryHandler : IRequestHandler<ListUsersQuery, OperationResult<PagedResult<KooliProjekt.Application.Data.User>>>
     {
         private readonly ApplicationDbContext _dbContext;
         public ListUsersQueryHandler(ApplicationDbContext dbContext)
@@ -20,13 +20,13 @@ namespace KooliProjekt.Application.Features.Users
             _dbContext = dbContext;
         }
 
-        public async Task<OperationResult<IList<KooliProjekt.Application.Data.User>>> Handle(ListUsersQuery request, CancellationToken cancellationToken)
+        public async Task<OperationResult<PagedResult<KooliProjekt.Application.Data.User>>> Handle(ListUsersQuery request, CancellationToken cancellationToken)
         {
-            var result = new OperationResult<IList<KooliProjekt.Application.Data.User>>();
+            var result = new OperationResult<PagedResult<KooliProjekt.Application.Data.User>>();
             result.Value = await _dbContext
                 .Users
-                .OrderBy(u => u.LastName)
-                .ToListAsync(cancellationToken); //Allows the caller to cancel the ongoing query/operation
+                .OrderBy(list => list.LastName)
+                .GetPagedAsync(request.Page, request.PageSize);
 
             return result;
         }

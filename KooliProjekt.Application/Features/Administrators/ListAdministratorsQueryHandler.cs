@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace KooliProjekt.Application.Features.Administrators
 {
-    public class ListAdministratorsQueryHandler : IRequestHandler<ListAdministratorsQuery, OperationResult<IList<KooliProjekt.Application.Data.Administrator>>>
+    public class ListAdministratorsQueryHandler : IRequestHandler<ListAdministratorsQuery, OperationResult<PagedResult<KooliProjekt.Application.Data.Administrator>>>
     {
         private readonly ApplicationDbContext _dbContext;
         public ListAdministratorsQueryHandler(ApplicationDbContext dbContext)
@@ -20,13 +20,13 @@ namespace KooliProjekt.Application.Features.Administrators
             _dbContext = dbContext;
         }
 
-        public async Task<OperationResult<IList<KooliProjekt.Application.Data.Administrator>>> Handle(ListAdministratorsQuery request, CancellationToken cancellationToken)
+        public async Task<OperationResult<PagedResult<KooliProjekt.Application.Data.Administrator>>> Handle(ListAdministratorsQuery request, CancellationToken cancellationToken)
         {
-            var result = new OperationResult<IList<KooliProjekt.Application.Data.Administrator>>();
+            var result = new OperationResult<PagedResult<KooliProjekt.Application.Data.Administrator>>();
             result.Value = await _dbContext
                 .Administrators
-                .OrderBy(r => r.AdminId)
-                .ToListAsync(cancellationToken); //Allows the caller to cancel the ongoing query/operation
+                .OrderBy(list => list.AdminId)
+                .GetPagedAsync(request.Page, request.PageSize);
 
             return result;
         }

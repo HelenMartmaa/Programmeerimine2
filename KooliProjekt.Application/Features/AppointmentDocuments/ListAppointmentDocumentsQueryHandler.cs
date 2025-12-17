@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace KooliProjekt.Application.Features.AppointmentDocuments
 {
-    public class ListAppointmentDocumentsQueryHandler : IRequestHandler<ListAppointmentDocumentsQuery, OperationResult<IList<KooliProjekt.Application.Data.AppointmentDocument>>>
+    public class ListAppointmentDocumentsQueryHandler : IRequestHandler<ListAppointmentDocumentsQuery, OperationResult<PagedResult<KooliProjekt.Application.Data.AppointmentDocument>>>
     {
         private readonly ApplicationDbContext _dbContext;
         public ListAppointmentDocumentsQueryHandler(ApplicationDbContext dbContext)
@@ -20,13 +20,13 @@ namespace KooliProjekt.Application.Features.AppointmentDocuments
             _dbContext = dbContext;
         }
 
-        public async Task<OperationResult<IList<KooliProjekt.Application.Data.AppointmentDocument>>> Handle(ListAppointmentDocumentsQuery request, CancellationToken cancellationToken)
+        public async Task<OperationResult<PagedResult<KooliProjekt.Application.Data.AppointmentDocument>>> Handle(ListAppointmentDocumentsQuery request, CancellationToken cancellationToken)
         {
-            var result = new OperationResult<IList<KooliProjekt.Application.Data.AppointmentDocument>>();
+            var result = new OperationResult<PagedResult<KooliProjekt.Application.Data.AppointmentDocument>>();
             result.Value = await _dbContext
                 .AppointmentDocuments
-                .OrderBy(r => r.DocumentId)
-                .ToListAsync(cancellationToken); //Allows the caller to cancel the ongoing query/operation
+                .OrderBy(list => list.DocumentId)
+                .GetPagedAsync(request.Page, request.PageSize);
 
             return result;
         }

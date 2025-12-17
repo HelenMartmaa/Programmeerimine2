@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace KooliProjekt.Application.Features.Doctors
 {
-    public class ListDoctorsQueryHandler : IRequestHandler<ListDoctorsQuery, OperationResult<IList<KooliProjekt.Application.Data.Doctor>>>
+    public class ListDoctorsQueryHandler : IRequestHandler<ListDoctorsQuery, OperationResult<PagedResult<KooliProjekt.Application.Data.Doctor>>>
     {
         private readonly ApplicationDbContext _dbContext;
         public ListDoctorsQueryHandler(ApplicationDbContext dbContext)
@@ -20,13 +20,13 @@ namespace KooliProjekt.Application.Features.Doctors
             _dbContext = dbContext;
         }
 
-        public async Task<OperationResult<IList<KooliProjekt.Application.Data.Doctor>>> Handle(ListDoctorsQuery request, CancellationToken cancellationToken)
+        public async Task<OperationResult<PagedResult<KooliProjekt.Application.Data.Doctor>>> Handle(ListDoctorsQuery request, CancellationToken cancellationToken)
         {
-            var result = new OperationResult<IList<KooliProjekt.Application.Data.Doctor>>();
+            var result = new OperationResult<PagedResult<KooliProjekt.Application.Data.Doctor>>();
             result.Value = await _dbContext
                 .Doctors
-                .OrderBy(r => r.DoctorId)
-                .ToListAsync(cancellationToken); //Allows the caller to cancel the ongoing query/operation
+                .OrderBy(list => list.DoctorId)
+                .GetPagedAsync(request.Page, request.PageSize);
 
             return result;
         }

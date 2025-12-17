@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace KooliProjekt.Application.Features.InvoiceRows
 {
-    public class ListInvoiceRowsQueryHandler : IRequestHandler<ListInvoiceRowsQuery, OperationResult<IList<KooliProjekt.Application.Data.InvoiceRow>>>
+    public class ListInvoiceRowsQueryHandler : IRequestHandler<ListInvoiceRowsQuery, OperationResult<PagedResult<KooliProjekt.Application.Data.InvoiceRow>>>
     {
         private readonly ApplicationDbContext _dbContext;
         public ListInvoiceRowsQueryHandler(ApplicationDbContext dbContext)
@@ -20,13 +20,13 @@ namespace KooliProjekt.Application.Features.InvoiceRows
             _dbContext = dbContext;
         }
 
-        public async Task<OperationResult<IList<KooliProjekt.Application.Data.InvoiceRow>>> Handle(ListInvoiceRowsQuery request, CancellationToken cancellationToken)
+        public async Task<OperationResult<PagedResult<KooliProjekt.Application.Data.InvoiceRow>>> Handle(ListInvoiceRowsQuery request, CancellationToken cancellationToken)
         {
-            var result = new OperationResult<IList<KooliProjekt.Application.Data.InvoiceRow>>();
+            var result = new OperationResult<PagedResult<KooliProjekt.Application.Data.InvoiceRow>>();
             result.Value = await _dbContext
                 .InvoiceRows
-                .OrderBy(r => r.InvoiceRowId)
-                .ToListAsync(cancellationToken); //Allows the caller to cancel the ongoing query/operation
+                .OrderBy(list => list.InvoiceRowId)
+                .GetPagedAsync(request.Page, request.PageSize);
 
             return result;
         }

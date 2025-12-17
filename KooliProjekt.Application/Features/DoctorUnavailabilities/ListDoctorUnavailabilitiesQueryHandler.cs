@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace KooliProjekt.Application.Features.DoctorUnavailabilities
 {
-    public class ListDoctorUnavailabilitiesQueryHandler : IRequestHandler<ListDoctorUnavailabilitiesQuery, OperationResult<IList<KooliProjekt.Application.Data.DoctorUnavailability>>>
+    public class ListDoctorUnavailabilitiesQueryHandler : IRequestHandler<ListDoctorUnavailabilitiesQuery, OperationResult<PagedResult<KooliProjekt.Application.Data.DoctorUnavailability>>>
     {
         private readonly ApplicationDbContext _dbContext;
         public ListDoctorUnavailabilitiesQueryHandler(ApplicationDbContext dbContext)
@@ -20,13 +20,13 @@ namespace KooliProjekt.Application.Features.DoctorUnavailabilities
             _dbContext = dbContext;
         }
 
-        public async Task<OperationResult<IList<KooliProjekt.Application.Data.DoctorUnavailability>>> Handle(ListDoctorUnavailabilitiesQuery request, CancellationToken cancellationToken)
+        public async Task<OperationResult<PagedResult<KooliProjekt.Application.Data.DoctorUnavailability>>> Handle(ListDoctorUnavailabilitiesQuery request, CancellationToken cancellationToken)
         {
-            var result = new OperationResult<IList<KooliProjekt.Application.Data.DoctorUnavailability>>();
+            var result = new OperationResult<PagedResult<KooliProjekt.Application.Data.DoctorUnavailability>>();
             result.Value = await _dbContext
                 .DoctorUnavailabilities
-                .OrderBy(r => r.DoctorId)
-                .ToListAsync(cancellationToken); //Allows the caller to cancel the ongoing query/operation
+                .OrderBy(list => list.DoctorId)
+                .GetPagedAsync(request.Page, request.PageSize);
 
             return result;
         }
