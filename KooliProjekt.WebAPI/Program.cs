@@ -53,6 +53,19 @@ namespace KooliProjekt.WebAPI
 
             app.MapControllers();
 
+            // Seed andmed arenduse jaoks
+            if (app.Environment.IsDevelopment())
+            {
+                using (var scope = app.Services.CreateScope())
+                {
+                    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    var seeder = new SeedData(context);
+                    seeder.Generate();
+                }
+            }
+
+            app.Run();
+
             app.Run();
         }
     }
