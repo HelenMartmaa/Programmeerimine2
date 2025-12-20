@@ -7,9 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KooliProjekt.Application.Features.Doctors
+namespace KooliProjekt.Application.Features.DoctorUnavailabilities
 {
-    public class DeleteDoctorsCommand : IRequest<OperationResult>, ITransactional
+    public class DeleteDoctorUnavailabilityCommand : IRequest<OperationResult>, ITransactional
     {
         public int Id { get; set; }
     }

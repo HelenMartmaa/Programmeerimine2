@@ -8,16 +8,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace KooliProjekt.Application.Features.Users
 {
-    public class DeleteUsersCommandHandler : IRequestHandler<DeleteUsersCommand, OperationResult>
+    public class DeleteUserCommandHandler : IRequestHandler<DeleteUserCommand, OperationResult>
     {
         private readonly ApplicationDbContext _dbContext;
 
-        public DeleteUsersCommandHandler(ApplicationDbContext dbContext)
+        public DeleteUserCommandHandler(ApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
         }
 
-        public async Task<OperationResult> Handle(DeleteUsersCommand request, CancellationToken cancellationToken)
+        public async Task<OperationResult> Handle(DeleteUserCommand request, CancellationToken cancellationToken)
         {
             // User can be Client, Doctor  or Administrator, the role needs to be deleted before deleting user
 

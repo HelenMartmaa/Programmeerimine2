@@ -14,16 +14,16 @@ namespace KooliProjekt.Application.Features.Administrators
 {
     // Based on 15.11.2025 class
     // Handler for deletion command
-    public class DeleteAdministratorsCommandHandler : IRequestHandler<DeleteAdministratorsCommand, OperationResult>
+    public class DeleteAdministratorCommandHandler : IRequestHandler<DeleteAdministratorCommand, OperationResult>
     {
         private readonly ApplicationDbContext _dbContext;
 
-        public DeleteAdministratorsCommandHandler(ApplicationDbContext dbContext)
+        public DeleteAdministratorCommandHandler(ApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
         }
 
-        public async Task<OperationResult> Handle(DeleteAdministratorsCommand request, CancellationToken cancellationToken)
+        public async Task<OperationResult> Handle(DeleteAdministratorCommand request, CancellationToken cancellationToken)
         {
             var result = new OperationResult();
 

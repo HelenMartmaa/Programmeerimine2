@@ -8,16 +8,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace KooliProjekt.Application.Features.Appointments
 {
-    public class DeleteAppointmentsCommandHandler : IRequestHandler<DeleteAppointmentsCommand, OperationResult>
+    public class DeleteAppointmentCommandHandler : IRequestHandler<DeleteAppointmentCommand, OperationResult>
     {
         private readonly ApplicationDbContext _dbContext;
 
-        public DeleteAppointmentsCommandHandler(ApplicationDbContext dbContext)
+        public DeleteAppointmentCommandHandler(ApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
         }
 
-        public async Task<OperationResult> Handle(DeleteAppointmentsCommand request, CancellationToken cancellationToken)
+        public async Task<OperationResult> Handle(DeleteAppointmentCommand request, CancellationToken cancellationToken)
         {
             // Delete AppointmentDocuments
             await _dbContext.AppointmentDocuments

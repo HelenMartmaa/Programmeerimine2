@@ -7,9 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KooliProjekt.Application.Features.Appointments
+namespace KooliProjekt.Application.Features.Clients
 {
-    public class DeleteAppointmentsCommand : IRequest<OperationResult>, ITransactional
+    public class DeleteClientCommand : IRequest<OperationResult>, ITransactional
     {
         public int Id { get; set; }
     }

@@ -7,9 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KooliProjekt.Application.Features.InvoiceRows
+namespace KooliProjekt.Application.Features.Doctors
 {
-    public class DeleteInvoiceRowsCommand : IRequest<OperationResult>, ITransactional
+    public class DeleteDoctorCommand : IRequest<OperationResult>, ITransactional
     {
         public int Id { get; set; }
     }

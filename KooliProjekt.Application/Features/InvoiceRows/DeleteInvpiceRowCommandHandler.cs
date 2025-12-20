@@ -8,16 +8,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace KooliProjekt.Application.Features.InvoiceRows
 {
-    public class DeleteInvoiceRowsCommandHandler : IRequestHandler<DeleteInvoiceRowsCommand, OperationResult>
+    public class DeleteInvoiceRowCommandHandler : IRequestHandler<DeleteInvoiceRowCommand, OperationResult>
     {
         private readonly ApplicationDbContext _dbContext;
 
-        public DeleteInvoiceRowsCommandHandler(ApplicationDbContext dbContext)
+        public DeleteInvoiceRowCommandHandler(ApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
         }
 
-        public async Task<OperationResult> Handle(DeleteInvoiceRowsCommand request, CancellationToken cancellationToken)
+        public async Task<OperationResult> Handle(DeleteInvoiceRowCommand request, CancellationToken cancellationToken)
         {
             await _dbContext.InvoiceRows
                 .Where(ir => ir.InvoiceRowId == request.Id)

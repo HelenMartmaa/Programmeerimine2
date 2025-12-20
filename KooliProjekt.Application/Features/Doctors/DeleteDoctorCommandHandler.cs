@@ -6,31 +6,31 @@ using KooliProjekt.Application.Infrastructure.Results;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace KooliProjekt.Application.Features.Clients
+namespace KooliProjekt.Application.Features.Doctors
 {
-    public class DeleteClientsCommandHandler : IRequestHandler<DeleteClientsCommand, OperationResult>
+    public class DeleteDoctorCommandHandler : IRequestHandler<DeleteDoctorCommand, OperationResult>
     {
         private readonly ApplicationDbContext _dbContext;
 
-        public DeleteClientsCommandHandler(ApplicationDbContext dbContext)
+        public DeleteDoctorCommandHandler(ApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
         }
 
-        public async Task<OperationResult> Handle(DeleteClientsCommand request, CancellationToken cancellationToken)
+        public async Task<OperationResult> Handle(DeleteDoctorCommand request, CancellationToken cancellationToken)
         {
-            // All client appointments
+            // All doctor appointments
             var appointmentIds = await _dbContext.Appointments
-                .Where(a => a.ClientId == request.Id)
+                .Where(a => a.DoctorId == request.Id)
                 .Select(a => a.AppointmentId)
                 .ToListAsync(cancellationToken);
 
-            // Delete all related AppointmentDocuments
+            // Delete AppointmentDocuments
             await _dbContext.AppointmentDocuments
                 .Where(ad => appointmentIds.Contains(ad.AppointmentId))
                 .ExecuteDeleteAsync(cancellationToken);
 
-            // Delete all InvoiceRows through Invoices
+            // Delete InvoiceRows
             var invoiceIds = await _dbContext.Invoices
                 .Where(i => appointmentIds.Contains(i.AppointmentId))
                 .Select(i => i.InvoiceId)
@@ -47,12 +47,17 @@ namespace KooliProjekt.Application.Features.Clients
 
             // Delete Appointments
             await _dbContext.Appointments
-                .Where(a => a.ClientId == request.Id)
+                .Where(a => a.DoctorId == request.Id)
                 .ExecuteDeleteAsync(cancellationToken);
 
-            // Delete Client
-            await _dbContext.Clients
-                .Where(c => c.ClientId == request.Id)
+            // Delete DoctorUnavailabilities
+            await _dbContext.DoctorUnavailabilities
+                .Where(du => du.DoctorId == request.Id)
+                .ExecuteDeleteAsync(cancellationToken);
+
+            // Delete Doctor
+            await _dbContext.Doctors
+                .Where(d => d.DoctorId == request.Id)
                 .ExecuteDeleteAsync(cancellationToken);
 
             return new OperationResult();

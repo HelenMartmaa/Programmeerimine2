@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace KooliProjekt.Application.Features.Administrators
 {
     //Command to delete Administrators
-    public class DeleteAdministratorsCommand : IRequest<OperationResult>, ITransactional
+    public class DeleteAdministratorCommand : IRequest<OperationResult>, ITransactional
     {
         public int Id { get; set; }
     }

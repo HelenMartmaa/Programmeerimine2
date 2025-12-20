@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace KooliProjekt.Application.Features.AppointmentDocuments
 {
-    public class DeleteAppointmentDocumentsCommand : IRequest<OperationResult>, ITransactional
+    public class DeleteAppointmentDocumentCommand : IRequest<OperationResult>, ITransactional
     {
         public int Id { get; set; }
     }

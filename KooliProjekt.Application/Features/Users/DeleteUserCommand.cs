@@ -7,9 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KooliProjekt.Application.Features.Clients
+namespace KooliProjekt.Application.Features.Users
 {
-    public class DeleteClientsCommand : IRequest<OperationResult>, ITransactional
+    public class DeleteUserCommand : IRequest<OperationResult>, ITransactional
     {
         public int Id { get; set; }
     }
