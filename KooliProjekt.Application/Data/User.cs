@@ -22,10 +22,13 @@ namespace KooliProjekt.Application.Data
         public string PasswordHash { get; set; }
         [Required]
         [MaxLength(50)]
+        [MinLength(2)]
         public string FirstName { get; set; }
         [Required]
         [MaxLength(50)]
+        [MinLength(2)]
         public string LastName { get; set; }
+        [Required]
         [MaxLength(20)]
         public string PhoneNumber { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
