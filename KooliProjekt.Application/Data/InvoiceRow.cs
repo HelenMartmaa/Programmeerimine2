@@ -17,6 +17,7 @@ namespace KooliProjekt.Application.Data
         public int InvoiceId { get; set; }
         [Required]
         [MaxLength(200)]
+        [MinLength(3)]
         public string ServiceDescription { get; set; }
         [Column(TypeName = "decimal(10,2)")]
         [Range(0, 10000)]
@@ -24,7 +25,7 @@ namespace KooliProjekt.Application.Data
         [Range(1, 100)]
         public int Quantity { get; set; }
         [Column(TypeName = "decimal(10,2)")]
-        [Range(0, 10000)]
+        [Range(0, 99999)]
         public decimal Discount { get; set; }
 
         //Navigation property

@@ -101,7 +101,7 @@ namespace KooliProjekt.Application.Data
         private void GenerateDoctors()
         {
             var doctorUsers = _users.Where(u => u.Role == UserRole.Doctor).ToList();
-            var specializations = new[] { "Perearst", "Hambaarst", "Kardioloog", "Dermatoloog", "Ortopeed", "Pediaater", "Neuroloog", "Laborispetsialist" };
+            var specializations = new[] { "General Practitioner", "Dentist", "Cardiologist", "Dermatologist", "Orthopedisst", "Pediatrician", "Neurologist", "Laboratory Specialist" };
 
             foreach (var user in doctorUsers)
             {
@@ -124,7 +124,7 @@ namespace KooliProjekt.Application.Data
         private void GenerateAdministrators()
         {
             var adminUsers = _users.Where(u => u.Role == UserRole.Administrator).ToList();
-            var departments = new[] { "Üldregistratuur", "Sisehaiguste_osakond", "Eriarstide_osakond", "Analüüside osakond" };
+            var departments = new[] { "Reception", "Internal Medicine", "Specialist Clinics", "Laboratory Services" };
 
             foreach (var user in adminUsers)
             {
@@ -174,7 +174,7 @@ namespace KooliProjekt.Application.Data
                     DurationMinutes = 30, // default length of 1 appointment
                     Status = (AppointmentStatus)(i % 4), // Scheduled, Completed, Cancelled, NoShow
                     IsOutsideWorkingHours = false,
-                    Notes = $"Test broneering nr {i}",
+                    Notes = $"Test appointment number {i}",
                     CreatedAt = DateTime.Now.AddDays(-i),
                     CancelledAt = (i % 4 == 2) ? (DateTime?)DateTime.Now.AddDays(-i + 1) : null
                 };
@@ -194,11 +194,11 @@ namespace KooliProjekt.Application.Data
 
             var services = new[]
             {
-                new { Description = "Konsultatsioon", Fee = 50m },
-                new { Description = "Üldine tervisekontroll", Fee = 80m },
-                new { Description = "Raviplaani koostamine", Fee = 100m },
-                new { Description = "Vereanalüüs", Fee = 30m },
-                new { Description = "Vaktsineerimine", Fee = 25m }
+                new { Description = "Consultation", Fee = 50m },
+                new { Description = "Health Check-Up", Fee = 80m },
+                new { Description = "Treatmen Planning", Fee = 100m },
+                new { Description = "Blood Tests", Fee = 30m },
+                new { Description = "Immunization", Fee = 25m }
             };
 
             foreach (var appointment in completedAppointments)
@@ -266,9 +266,9 @@ namespace KooliProjekt.Application.Data
                         EndDate = endDate,
                         Reason = random.Next(3) switch
                         {
-                            0 => "Puhkus",
-                            1 => "Koolitus",
-                            _ => "Haigus"
+                            0 => "Vacation",
+                            1 => "Training",
+                            _ => "Sick leave"
                         }
                     };
 
@@ -283,7 +283,7 @@ namespace KooliProjekt.Application.Data
         private void GenerateAppointmentDocuments()
         {
             var random = new Random();
-            var documentTypes = new[] { "Vaktsineerimisinfo", "Analüüsi tulemused", "Tervisetõend", "Retsept", "Edasi suunamine", "Lisa", "Raviplaan" };
+            var documentTypes = new[] { "Immunization Info", "Tests Results", "Medical Certificate", "Prescription", "Referral", "Additional Information", "Treatment Plan" };
 
             // Add documents to only completed appointments, to half of them
             var completedAppointments = _dbContext.Appointments

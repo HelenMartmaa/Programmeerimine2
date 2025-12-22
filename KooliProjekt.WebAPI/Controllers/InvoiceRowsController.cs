@@ -32,7 +32,7 @@ namespace KooliProjekt.WebAPI.Controllers
 
             return Result(response);
         }
-
+        */
         [HttpPost]
         [Route("Save")]
         public async Task<IActionResult> Save(SaveInvoiceRowCommand command)
@@ -41,7 +41,7 @@ namespace KooliProjekt.WebAPI.Controllers
 
             return Result(response);
         }
-        */
+        
         // Based on 15.11.2025
         // API endpoint to delete InvoiceRow
         [HttpDelete]
