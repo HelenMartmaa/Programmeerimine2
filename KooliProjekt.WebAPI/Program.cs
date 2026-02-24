@@ -1,6 +1,7 @@
 using FluentValidation;
 using KooliProjekt.Application.Behaviors;
 using KooliProjekt.Application.Data;
+using KooliProjekt.Application.Data.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -39,6 +40,17 @@ namespace KooliProjekt.WebAPI
                 config.AddOpenBehavior(typeof(TransactionalBehavior<,>));
             });
 
+            builder.Services.AddScoped<IAdministratorRepository, AdministratorRepository>();
+            builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
+            builder.Services.AddScoped<IAppointmentDocumentRepository, AppointmentDocumentRepository>();
+            builder.Services.AddScoped<IClientRepository, ClientRepository>();
+            builder.Services.AddScoped<IDoctorRepository, DoctorRepository>();
+            builder.Services.AddScoped<IDoctorUnavailabilityRepository, DoctorUnavailabilityRepository>();
+            builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
+            builder.Services.AddScoped<IInvoiceRowRepository, InvoiceRowRepository>();
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+            
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -53,18 +65,19 @@ namespace KooliProjekt.WebAPI
 
             app.MapControllers();
 
-            // Seed andmed arenduse jaoks
-            if (app.Environment.IsDevelopment())
+            //15.11 - andmebaasi loomine, kui seda pole
+            using (var scope = app.Services.CreateScope())
+            using (var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>())
             {
-                using (var scope = app.Services.CreateScope())
-                {
-                    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                    var seeder = new SeedData(context);
-                    seeder.Generate();
-                }
-            }
+                dbContext.Database.Migrate();
 
-            app.Run();
+                // Preprotsessori direktiiv, mis tagab, et andmete genereerimine
+                // toimub ainult arendusrežiimis
+#if DEBUG
+                var generator = new SeedData(dbContext);
+                generator.Generate();
+#endif
+            }
 
             app.Run();
         }
