@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace KooliProjekt.Application.UnitTests
 {
-    public abstract class ServiceTestBase : IDisposable
+    public abstract class TestBase : IDisposable
     {
         private ApplicationDbContext _dbContext;
         private bool disposedValue;

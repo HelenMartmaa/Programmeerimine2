@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using KooliProjekt.Application.Data;
 using KooliProjekt.Application.Infrastructure.Paging;
@@ -6,12 +7,15 @@ using MediatR;
 
 namespace KooliProjekt.Application.Dto
 {
-    public class InvoiceRowDto
+    public class InvoiceDto
     {
         public int Id { get; set; }
-        public string ServiceDescription { get; set; }
-        public decimal Fee { get; set; }
-        public int Quantity { get; set; }
-        public decimal Discount { get; set; }
+        public int AppointmentId { get; set; }
+        public DateTime InvoiceDate { get; set; }
+        public DateTime DueDate { get; set; }
+        public decimal TotalBeforeVat { get; set; }
+        public decimal TotalWithVat { get; set; }
+        public bool IsPaid { get; set; }
+        public string InvoiceNum { get; set; }
     }
 }
