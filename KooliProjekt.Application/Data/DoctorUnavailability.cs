@@ -12,6 +12,13 @@ namespace KooliProjekt.Application.Data
     {
         [Key]
         public int UnavailabilityId { get; set; }
+
+        public override int Id
+        {
+            get => UnavailabilityId;
+            set => UnavailabilityId = value;
+        }
+
         [Required] //Although int can't be nullable anyway
         [ForeignKey("Doctor")]
         public int DoctorId { get; set; }

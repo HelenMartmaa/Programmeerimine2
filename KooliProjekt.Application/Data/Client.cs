@@ -12,6 +12,13 @@ namespace KooliProjekt.Application.Data
     {
         [Key]
         public int ClientId { get; set; }
+
+        public override int Id
+        {
+            get => ClientId;
+            set => ClientId = value;
+        }
+
         [Required] //Although int can't be nullable anyway
         [ForeignKey("User")]
         public int UserId { get; set; }

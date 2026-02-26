@@ -12,6 +12,13 @@ namespace KooliProjekt.Application.Data
     {
         [Key]
         public int UserId { get; set; }
+
+        public override int Id
+        {
+            get => UserId;
+            set => UserId = value;
+        }
+
         public UserRole Role { get; set; }
         [Required]
         [MaxLength(100)]
