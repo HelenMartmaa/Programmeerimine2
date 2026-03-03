@@ -12,20 +12,36 @@ using Microsoft.EntityFrameworkCore;
 
 namespace KooliProjekt.Application.Features.Doctors
 {
-    public class ListDoctorsQueryHandler : IRequestHandler<ListDoctorsQuery, OperationResult<PagedResult<KooliProjekt.Application.Data.Doctor>>>
+    public class ListDoctorsQueryHandler : IRequestHandler<ListDoctorsQuery, OperationResult<PagedResult<Doctor>>>
     {
         private readonly ApplicationDbContext _dbContext;
+
         public ListDoctorsQueryHandler(ApplicationDbContext dbContext)
         {
+            if (dbContext == null)
+            {
+                throw new ArgumentNullException(nameof(dbContext));
+            }
             _dbContext = dbContext;
         }
 
-        public async Task<OperationResult<PagedResult<KooliProjekt.Application.Data.Doctor>>> Handle(ListDoctorsQuery request, CancellationToken cancellationToken)
+        public async Task<OperationResult<PagedResult<Doctor>>> Handle(ListDoctorsQuery request, CancellationToken cancellationToken)
         {
-            var result = new OperationResult<PagedResult<KooliProjekt.Application.Data.Doctor>>();
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+
+            var result = new OperationResult<PagedResult<Doctor>>();
+
+            if (request.Page <= 0 || request.PageSize <= 0)
+            {
+                return result;
+            }
+
             result.Value = await _dbContext
                 .Doctors
-                .OrderBy(list => list.DoctorId)
+                .OrderBy(d => d.DoctorId)
                 .GetPagedAsync(request.Page, request.PageSize);
 
             return result;

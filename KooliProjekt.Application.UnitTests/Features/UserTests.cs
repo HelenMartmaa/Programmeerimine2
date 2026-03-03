@@ -59,19 +59,18 @@ namespace KooliProjekt.Application.UnitTests.Features
         }
 
         [Fact]
-        public async Task Get_should_survive_null_request()
+        public async Task Get_should_throw_when_request_is_null()
         {
             // Arrange
-            var query = (GetUserQuery)null;
+            var request = (GetUserQuery)null;
             var handler = new GetUserQueryHandler(DbContext);
 
-            // Act
-            var result = await handler.Handle(query, CancellationToken.None);
-
-            // Assert
-            Assert.NotNull(result);
-            Assert.False(result.HasErrors);
-            Assert.Null(result.Value);
+            // Act && Assert
+            var ex = await Assert.ThrowsAsync<ArgumentNullException>(async () =>
+            {
+                await handler.Handle(request, CancellationToken.None);
+            });
+            Assert.Equal("request", ex.ParamName);
         }
     }
 }

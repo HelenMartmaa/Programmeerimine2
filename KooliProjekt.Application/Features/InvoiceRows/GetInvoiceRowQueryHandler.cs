@@ -25,12 +25,12 @@ namespace KooliProjekt.Application.Features.InvoiceRows
 
         public async Task<OperationResult<InvoiceRowDetailsDto>> Handle(GetInvoiceRowQuery request, CancellationToken cancellationToken)
         {
-            var result = new OperationResult<InvoiceRowDetailsDto>();
-
             if (request == null)
             {
-                return result;
+                throw new ArgumentNullException(nameof(request));
             }
+
+            var result = new OperationResult<InvoiceRowDetailsDto>();
 
             if (request.Id <= 0)
             {

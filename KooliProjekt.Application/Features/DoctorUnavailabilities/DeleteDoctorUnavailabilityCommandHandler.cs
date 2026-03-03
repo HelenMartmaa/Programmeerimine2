@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using KooliProjekt.Application.Data;
@@ -14,16 +15,39 @@ namespace KooliProjekt.Application.Features.DoctorUnavailabilities
 
         public DeleteDoctorUnavailabilityCommandHandler(ApplicationDbContext dbContext)
         {
+            if (dbContext == null)
+            {
+                throw new ArgumentNullException(nameof(dbContext));
+            }
             _dbContext = dbContext;
         }
 
         public async Task<OperationResult> Handle(DeleteDoctorUnavailabilityCommand request, CancellationToken cancellationToken)
         {
-            await _dbContext.DoctorUnavailabilities
-                .Where(du => du.UnavailabilityId == request.Id)
-                .ExecuteDeleteAsync(cancellationToken);
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
 
-            return new OperationResult();
+            var result = new OperationResult();
+
+            if (request.Id <= 0)
+            {
+                return result;
+            }
+
+            var unavailability = await _dbContext.DoctorUnavailabilities
+                .FirstOrDefaultAsync(u => u.UnavailabilityId == request.Id);
+
+            if (unavailability == null)
+            {
+                return result;
+            }
+
+            _dbContext.DoctorUnavailabilities.Remove(unavailability);
+            await _dbContext.SaveChangesAsync();
+
+            return result;
         }
     }
 }

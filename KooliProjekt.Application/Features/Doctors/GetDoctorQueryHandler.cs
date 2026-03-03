@@ -25,12 +25,12 @@ namespace KooliProjekt.Application.Features.Doctors
 
         public async Task<OperationResult<DoctorDetailsDto>> Handle(GetDoctorQuery request, CancellationToken cancellationToken)
         {
-            var result = new OperationResult<DoctorDetailsDto>();
-
             if (request == null)
             {
-                return result;
+                throw new ArgumentNullException(nameof(request));
             }
+
+            var result = new OperationResult<DoctorDetailsDto>();
 
             if (request.Id <= 0)
             {

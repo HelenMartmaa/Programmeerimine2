@@ -12,20 +12,36 @@ using Microsoft.EntityFrameworkCore;
 
 namespace KooliProjekt.Application.Features.AppointmentDocuments
 {
-    public class ListAppointmentDocumentsQueryHandler : IRequestHandler<ListAppointmentDocumentsQuery, OperationResult<PagedResult<KooliProjekt.Application.Data.AppointmentDocument>>>
+    public class ListAppointmentDocumentsQueryHandler : IRequestHandler<ListAppointmentDocumentsQuery, OperationResult<PagedResult<AppointmentDocument>>>
     {
         private readonly ApplicationDbContext _dbContext;
+
         public ListAppointmentDocumentsQueryHandler(ApplicationDbContext dbContext)
         {
+            if (dbContext == null)
+            {
+                throw new ArgumentNullException(nameof(dbContext));
+            }
             _dbContext = dbContext;
         }
 
-        public async Task<OperationResult<PagedResult<KooliProjekt.Application.Data.AppointmentDocument>>> Handle(ListAppointmentDocumentsQuery request, CancellationToken cancellationToken)
+        public async Task<OperationResult<PagedResult<AppointmentDocument>>> Handle(ListAppointmentDocumentsQuery request, CancellationToken cancellationToken)
         {
-            var result = new OperationResult<PagedResult<KooliProjekt.Application.Data.AppointmentDocument>>();
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+
+            var result = new OperationResult<PagedResult<AppointmentDocument>>();
+
+            if (request.Page <= 0 || request.PageSize <= 0)
+            {
+                return result;
+            }
+
             result.Value = await _dbContext
                 .AppointmentDocuments
-                .OrderBy(list => list.DocumentId)
+                .OrderBy(d => d.DocumentId)
                 .GetPagedAsync(request.Page, request.PageSize);
 
             return result;

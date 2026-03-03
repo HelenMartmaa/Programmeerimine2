@@ -7,8 +7,8 @@ using MediatR;
 
 namespace KooliProjekt.Application.Features.Administrators
 {
-    public class GetAdministratorQuery : IRequest<OperationResult<AdministratorDetailsDto>>
-    {
-        public int Id { get; set; }
-    }
+	public class GetAdministratorQuery : IRequest<OperationResult<AdministratorDetailsDto>>
+	{
+		public int Id { get; set; }
+	}
 }

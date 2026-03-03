@@ -25,12 +25,12 @@ namespace KooliProjekt.Application.Features.Administrators
 
         public async Task<OperationResult<AdministratorDetailsDto>> Handle(GetAdministratorQuery request, CancellationToken cancellationToken)
         {
-            var result = new OperationResult<AdministratorDetailsDto>();
-
             if (request == null)
             {
-                return result;
+                throw new ArgumentNullException(nameof(request));
             }
+
+            var result = new OperationResult<AdministratorDetailsDto>();
 
             if (request.Id <= 0)
             {

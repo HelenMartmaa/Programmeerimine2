@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using KooliProjekt.Application.Data;
@@ -14,48 +15,62 @@ namespace KooliProjekt.Application.Features.Clients
 
         public DeleteClientCommandHandler(ApplicationDbContext dbContext)
         {
+            if (dbContext == null)
+            {
+                throw new ArgumentNullException(nameof(dbContext));
+            }
             _dbContext = dbContext;
         }
 
         public async Task<OperationResult> Handle(DeleteClientCommand request, CancellationToken cancellationToken)
         {
-            // All client appointments
-            var appointmentIds = await _dbContext.Appointments
-                .Where(a => a.ClientId == request.Id)
-                .Select(a => a.AppointmentId)
-                .ToListAsync(cancellationToken);
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
 
-            // Delete all related AppointmentDocuments
-            await _dbContext.AppointmentDocuments
-                .Where(ad => appointmentIds.Contains(ad.AppointmentId))
-                .ExecuteDeleteAsync(cancellationToken);
+            var result = new OperationResult();
 
-            // Delete all InvoiceRows through Invoices
-            var invoiceIds = await _dbContext.Invoices
-                .Where(i => appointmentIds.Contains(i.AppointmentId))
-                .Select(i => i.InvoiceId)
-                .ToListAsync(cancellationToken);
+            if (request.Id <= 0)
+            {
+                return result;
+            }
 
-            await _dbContext.InvoiceRows
-                .Where(ir => invoiceIds.Contains(ir.InvoiceId))
-                .ExecuteDeleteAsync(cancellationToken);
+            var client = await _dbContext.Clients
+                .Include(c => c.Appointments)
+                    .ThenInclude(a => a.Documents)
+                .Include(c => c.Appointments)
+                    .ThenInclude(a => a.Invoice)
+                        .ThenInclude(i => i.InvoiceRows)
+                .FirstOrDefaultAsync(c => c.ClientId == request.Id);
 
-            // Delete Invoices
-            await _dbContext.Invoices
-                .Where(i => appointmentIds.Contains(i.AppointmentId))
-                .ExecuteDeleteAsync(cancellationToken);
+            if (client == null)
+            {
+                return result;
+            }
 
-            // Delete Appointments
-            await _dbContext.Appointments
-                .Where(a => a.ClientId == request.Id)
-                .ExecuteDeleteAsync(cancellationToken);
+            // Delete all related data
+            foreach (var appointment in client.Appointments)
+            {
+                if (appointment.Documents != null)
+                {
+                    _dbContext.AppointmentDocuments.RemoveRange(appointment.Documents);
+                }
+                if (appointment.Invoice != null)
+                {
+                    if (appointment.Invoice.InvoiceRows != null)
+                    {
+                        _dbContext.InvoiceRows.RemoveRange(appointment.Invoice.InvoiceRows);
+                    }
+                    _dbContext.Invoices.Remove(appointment.Invoice);
+                }
+            }
 
-            // Delete Client
-            await _dbContext.Clients
-                .Where(c => c.ClientId == request.Id)
-                .ExecuteDeleteAsync(cancellationToken);
+            _dbContext.Appointments.RemoveRange(client.Appointments);
+            _dbContext.Clients.Remove(client);
+            await _dbContext.SaveChangesAsync();
 
-            return new OperationResult();
+            return result;
         }
     }
 }

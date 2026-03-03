@@ -25,12 +25,12 @@ namespace KooliProjekt.Application.Features.Appointments
 
         public async Task<OperationResult<AppointmentDetailsDto>> Handle(GetAppointmentQuery request, CancellationToken cancellationToken)
         {
-            var result = new OperationResult<AppointmentDetailsDto>();
-
             if (request == null)
             {
-                return result;
+                throw new ArgumentNullException(nameof(request));
             }
+
+            var result = new OperationResult<AppointmentDetailsDto>();
 
             if (request.Id <= 0)
             {

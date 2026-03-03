@@ -25,12 +25,12 @@ namespace KooliProjekt.Application.Features.DoctorUnavailabilities
 
         public async Task<OperationResult<DoctorUnavailabilityDetailsDto>> Handle(GetDoctorUnavailabilityQuery request, CancellationToken cancellationToken)
         {
-            var result = new OperationResult<DoctorUnavailabilityDetailsDto>();
-
             if (request == null)
             {
-                return result;
+                throw new ArgumentNullException(nameof(request));
             }
+
+            var result = new OperationResult<DoctorUnavailabilityDetailsDto>();
 
             if (request.Id <= 0)
             {

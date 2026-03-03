@@ -62,20 +62,19 @@ namespace KooliProjekt.Application.UnitTests.Features
             Assert.Null(result.Value);
         }
 
-        [Fact]
-        public async Task Get_should_survive_null_request()
-        {
-            // Arrange
-            var query = (GetDoctorQuery)null;
-            var handler = new GetDoctorQueryHandler(DbContext);
+[Fact]
+public async Task Get_should_throw_when_request_is_null()
+{
+    // Arrange
+    var request = (GetDoctorQuery)null;
+    var handler = new GetDoctorQueryHandler(DbContext);
 
-            // Act
-            var result = await handler.Handle(query, CancellationToken.None);
-
-            // Assert
-            Assert.NotNull(result);
-            Assert.False(result.HasErrors);
-            Assert.Null(result.Value);
-        }
+    // Act && Assert
+    var ex = await Assert.ThrowsAsync<ArgumentNullException>(async () =>
+    {
+        await handler.Handle(request, CancellationToken.None);
+    });
+    Assert.Equal("request", ex.ParamName);
+}
     }
 }

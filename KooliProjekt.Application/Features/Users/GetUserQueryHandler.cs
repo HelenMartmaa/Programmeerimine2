@@ -25,12 +25,12 @@ namespace KooliProjekt.Application.Features.Users
 
         public async Task<OperationResult<UserDetailsDto>> Handle(GetUserQuery request, CancellationToken cancellationToken)
         {
-            var result = new OperationResult<UserDetailsDto>();
-
             if (request == null)
             {
-                return result;
+                throw new ArgumentNullException(nameof(request));
             }
+
+            var result = new OperationResult<UserDetailsDto>();
 
             if (request.Id <= 0)
             {

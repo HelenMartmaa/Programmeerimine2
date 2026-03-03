@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using KooliProjekt.Application.Data;
@@ -14,16 +15,39 @@ namespace KooliProjekt.Application.Features.AppointmentDocuments
 
         public DeleteAppointmentDocumentCommandHandler(ApplicationDbContext dbContext)
         {
+            if (dbContext == null)
+            {
+                throw new ArgumentNullException(nameof(dbContext));
+            }
             _dbContext = dbContext;
         }
 
         public async Task<OperationResult> Handle(DeleteAppointmentDocumentCommand request, CancellationToken cancellationToken)
         {
-            await _dbContext.AppointmentDocuments
-                .Where(ad => ad.DocumentId == request.Id)
-                .ExecuteDeleteAsync(cancellationToken);
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
 
-            return new OperationResult();
+            var result = new OperationResult();
+
+            if (request.Id <= 0)
+            {
+                return result;
+            }
+
+            var document = await _dbContext.AppointmentDocuments
+                .FirstOrDefaultAsync(d => d.DocumentId == request.Id);
+
+            if (document == null)
+            {
+                return result;
+            }
+
+            _dbContext.AppointmentDocuments.Remove(document);
+            await _dbContext.SaveChangesAsync();
+
+            return result;
         }
     }
 }

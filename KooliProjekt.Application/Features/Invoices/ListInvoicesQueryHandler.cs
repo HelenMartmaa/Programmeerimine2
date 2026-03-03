@@ -12,20 +12,36 @@ using Microsoft.EntityFrameworkCore;
 
 namespace KooliProjekt.Application.Features.Invoices
 {
-    public class ListInvoicesQueryHandler : IRequestHandler<ListInvoicesQuery, OperationResult<PagedResult<KooliProjekt.Application.Data.Invoice>>>
+    public class ListInvoicesQueryHandler : IRequestHandler<ListInvoicesQuery, OperationResult<PagedResult<Invoice>>>
     {
         private readonly ApplicationDbContext _dbContext;
+
         public ListInvoicesQueryHandler(ApplicationDbContext dbContext)
         {
+            if (dbContext == null)
+            {
+                throw new ArgumentNullException(nameof(dbContext));
+            }
             _dbContext = dbContext;
         }
 
-        public async Task<OperationResult<PagedResult<KooliProjekt.Application.Data.Invoice>>> Handle(ListInvoicesQuery request, CancellationToken cancellationToken)
+        public async Task<OperationResult<PagedResult<Invoice>>> Handle(ListInvoicesQuery request, CancellationToken cancellationToken)
         {
-            var result = new OperationResult<PagedResult<KooliProjekt.Application.Data.Invoice>>();
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+
+            var result = new OperationResult<PagedResult<Invoice>>();
+
+            if (request.Page <= 0 || request.PageSize <= 0)
+            {
+                return result;
+            }
+
             result.Value = await _dbContext
                 .Invoices
-                .OrderBy(list => list.InvoiceId)
+                .OrderBy(i => i.InvoiceId)
                 .GetPagedAsync(request.Page, request.PageSize);
 
             return result;

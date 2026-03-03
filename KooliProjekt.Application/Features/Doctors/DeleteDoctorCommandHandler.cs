@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using KooliProjekt.Application.Data;
@@ -14,53 +15,70 @@ namespace KooliProjekt.Application.Features.Doctors
 
         public DeleteDoctorCommandHandler(ApplicationDbContext dbContext)
         {
+            if (dbContext == null)
+            {
+                throw new ArgumentNullException(nameof(dbContext));
+            }
             _dbContext = dbContext;
         }
 
         public async Task<OperationResult> Handle(DeleteDoctorCommand request, CancellationToken cancellationToken)
         {
-            // All doctor appointments
-            var appointmentIds = await _dbContext.Appointments
-                .Where(a => a.DoctorId == request.Id)
-                .Select(a => a.AppointmentId)
-                .ToListAsync(cancellationToken);
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
 
-            // Delete AppointmentDocuments
-            await _dbContext.AppointmentDocuments
-                .Where(ad => appointmentIds.Contains(ad.AppointmentId))
-                .ExecuteDeleteAsync(cancellationToken);
+            var result = new OperationResult();
 
-            // Delete InvoiceRows
-            var invoiceIds = await _dbContext.Invoices
-                .Where(i => appointmentIds.Contains(i.AppointmentId))
-                .Select(i => i.InvoiceId)
-                .ToListAsync(cancellationToken);
+            if (request.Id <= 0)
+            {
+                return result;
+            }
 
-            await _dbContext.InvoiceRows
-                .Where(ir => invoiceIds.Contains(ir.InvoiceId))
-                .ExecuteDeleteAsync(cancellationToken);
+            var doctor = await _dbContext.Doctors
+                .Include(d => d.Appointments)
+                    .ThenInclude(a => a.Documents)
+                .Include(d => d.Appointments)
+                    .ThenInclude(a => a.Invoice)
+                        .ThenInclude(i => i.InvoiceRows)
+                .Include(d => d.Unavailabilities)
+                .FirstOrDefaultAsync(d => d.DoctorId == request.Id);
 
-            // Delete Invoices
-            await _dbContext.Invoices
-                .Where(i => appointmentIds.Contains(i.AppointmentId))
-                .ExecuteDeleteAsync(cancellationToken);
+            if (doctor == null)
+            {
+                return result;
+            }
 
-            // Delete Appointments
-            await _dbContext.Appointments
-                .Where(a => a.DoctorId == request.Id)
-                .ExecuteDeleteAsync(cancellationToken);
+            // Delete all related appointment data
+            foreach (var appointment in doctor.Appointments)
+            {
+                if (appointment.Documents != null)
+                {
+                    _dbContext.AppointmentDocuments.RemoveRange(appointment.Documents);
+                }
+                if (appointment.Invoice != null)
+                {
+                    if (appointment.Invoice.InvoiceRows != null)
+                    {
+                        _dbContext.InvoiceRows.RemoveRange(appointment.Invoice.InvoiceRows);
+                    }
+                    _dbContext.Invoices.Remove(appointment.Invoice);
+                }
+            }
+
+            _dbContext.Appointments.RemoveRange(doctor.Appointments);
 
             // Delete DoctorUnavailabilities
-            await _dbContext.DoctorUnavailabilities
-                .Where(du => du.DoctorId == request.Id)
-                .ExecuteDeleteAsync(cancellationToken);
+            if (doctor.Unavailabilities != null)
+            {
+                _dbContext.DoctorUnavailabilities.RemoveRange(doctor.Unavailabilities);
+            }
 
-            // Delete Doctor
-            await _dbContext.Doctors
-                .Where(d => d.DoctorId == request.Id)
-                .ExecuteDeleteAsync(cancellationToken);
+            _dbContext.Doctors.Remove(doctor);
+            await _dbContext.SaveChangesAsync();
 
-            return new OperationResult();
+            return result;
         }
     }
 }

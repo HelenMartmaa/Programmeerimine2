@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using KooliProjekt.Application.Data;
@@ -14,22 +15,46 @@ namespace KooliProjekt.Application.Features.Invoices
 
         public DeleteInvoiceCommandHandler(ApplicationDbContext dbContext)
         {
+            if (dbContext == null)
+            {
+                throw new ArgumentNullException(nameof(dbContext));
+            }
             _dbContext = dbContext;
         }
 
         public async Task<OperationResult> Handle(DeleteInvoiceCommand request, CancellationToken cancellationToken)
         {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+
+            var result = new OperationResult();
+
+            if (request.Id <= 0)
+            {
+                return result;
+            }
+
+            var invoice = await _dbContext.Invoices
+                .Include(i => i.InvoiceRows)
+                .FirstOrDefaultAsync(i => i.InvoiceId == request.Id);
+
+            if (invoice == null)
+            {
+                return result;
+            }
+
             // Delete InvoiceRows
-            await _dbContext.InvoiceRows
-                .Where(ir => ir.InvoiceId == request.Id)
-                .ExecuteDeleteAsync(cancellationToken);
+            if (invoice.InvoiceRows != null)
+            {
+                _dbContext.InvoiceRows.RemoveRange(invoice.InvoiceRows);
+            }
 
-            // Delete Invoice
-            await _dbContext.Invoices
-                .Where(i => i.InvoiceId == request.Id)
-                .ExecuteDeleteAsync(cancellationToken);
+            _dbContext.Invoices.Remove(invoice);
+            await _dbContext.SaveChangesAsync();
 
-            return new OperationResult();
+            return result;
         }
     }
 }

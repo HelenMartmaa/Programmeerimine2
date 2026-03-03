@@ -25,12 +25,12 @@ namespace KooliProjekt.Application.Features.Clients
 
         public async Task<OperationResult<ClientDetailsDto>> Handle(GetClientQuery request, CancellationToken cancellationToken)
         {
-            var result = new OperationResult<ClientDetailsDto>();
-
             if (request == null)
             {
-                return result;
+                throw new ArgumentNullException(nameof(request));
             }
+
+            var result = new OperationResult<ClientDetailsDto>();
 
             if (request.Id <= 0)
             {
