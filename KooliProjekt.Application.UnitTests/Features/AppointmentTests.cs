@@ -295,6 +295,52 @@ namespace KooliProjekt.Application.UnitTests.Features
             Assert.False(result.HasErrors);
         }
 
+		[Fact]
+		public async Task Delete_should_delete_appointment_with_documents_and_invoice()
+		{
+			// Arrange
+			var query = new DeleteAppointmentCommand { Id = 1 };
+			var handler = new DeleteAppointmentCommandHandler(DbContext);
+
+			var clientUser = new User { Email = "client@test.com", PasswordHash = "hash", FirstName = "Client", LastName = "User", PhoneNumber = "12345678" };
+			var doctorUser = new User { Email = "doctor@test.com", PasswordHash = "hash", FirstName = "Doctor", LastName = "User", PhoneNumber = "87654321" };
+			await DbContext.Users.AddAsync(clientUser);
+			await DbContext.Users.AddAsync(doctorUser);
+			await DbContext.SaveChangesAsync();
+
+			var client = new Client { UserId = clientUser.UserId, PersonalCode = "12345678901", DateOfBirth = DateTime.Now.AddYears(-30), Address = "Test St 1" };
+			var doctor = new Doctor { UserId = doctorUser.UserId, Specialization = "General", DocLicenseNum = "LIC001" };
+			await DbContext.Clients.AddAsync(client);
+			await DbContext.Doctors.AddAsync(doctor);
+			await DbContext.SaveChangesAsync();
+
+			var appointment = new Appointment { ClientId = client.ClientId, DoctorId = doctor.DoctorId, AppointmentDateTime = DateTime.Now };
+			await DbContext.Appointments.AddAsync(appointment);
+			await DbContext.SaveChangesAsync();
+
+			var document = new AppointmentDocument { AppointmentId = appointment.AppointmentId, DocumentType = "Report", FileName = "test.pdf", FilePath = "/files/test.pdf", FileSize = 1024 };
+			await DbContext.AppointmentDocuments.AddAsync(document);
+
+			var invoice = new Invoice { AppointmentId = appointment.AppointmentId, InvoiceDate = DateTime.Now, DueDate = DateTime.Now.AddDays(30), InvoiceNum = "INV-001" };
+			await DbContext.Invoices.AddAsync(invoice);
+			await DbContext.SaveChangesAsync();
+
+			var invoiceRow = new InvoiceRow { InvoiceId = invoice.InvoiceId, ServiceDescription = "Consultation", Fee = 50.00m, Quantity = 1, Discount = 0 };
+			await DbContext.InvoiceRows.AddAsync(invoiceRow);
+			await DbContext.SaveChangesAsync();
+
+			// Act
+			var result = await handler.Handle(query, CancellationToken.None);
+
+			// Assert
+			Assert.NotNull(result);
+			Assert.False(result.HasErrors);
+			Assert.Equal(0, DbContext.Appointments.Count());
+			Assert.Equal(0, DbContext.AppointmentDocuments.Count());
+			Assert.Equal(0, DbContext.Invoices.Count());
+			Assert.Equal(0, DbContext.InvoiceRows.Count());
+		}
+
         // SAVE tests
         [Fact]
         public void Save_should_throw_when_dbcontext_is_null()
