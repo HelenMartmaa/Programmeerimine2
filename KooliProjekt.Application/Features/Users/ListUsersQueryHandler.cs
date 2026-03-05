@@ -39,8 +39,24 @@ namespace KooliProjekt.Application.Features.Users
                 return result;
             }
 
-            result.Value = await _dbContext
-                .Users
+            var query = _dbContext.Users.AsQueryable();
+
+            if (!string.IsNullOrEmpty(request.FirstName))
+            {
+                query = query.Where(u => u.FirstName.Contains(request.FirstName));
+            }
+
+            if (!string.IsNullOrEmpty(request.LastName))
+            {
+                query = query.Where(u => u.LastName.Contains(request.LastName));
+            }
+
+            if (request.Role.HasValue)
+            {
+                query = query.Where(u => u.Role == request.Role.Value);
+            }
+
+            result.Value = await query
                 .OrderBy(u => u.LastName)
                 .GetPagedAsync(request.Page, request.PageSize);
 

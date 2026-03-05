@@ -22,7 +22,7 @@ namespace KooliProjekt.WebAPI.Controllers
 
             return Result(response);
         }
-        /*
+        
         [HttpGet]
         [Route("Get")]
         public async Task<IActionResult> Get(int id)
@@ -32,7 +32,7 @@ namespace KooliProjekt.WebAPI.Controllers
 
             return Result(response);
         }
-        */
+        
         [HttpPost]
         [Route("Save")]
         public async Task<IActionResult> Save(SaveAppointmentCommand command)

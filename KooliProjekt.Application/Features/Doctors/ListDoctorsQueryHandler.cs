@@ -39,8 +39,19 @@ namespace KooliProjekt.Application.Features.Doctors
                 return result;
             }
 
-            result.Value = await _dbContext
-                .Doctors
+            var query = _dbContext.Doctors.AsQueryable();
+
+            if (!string.IsNullOrEmpty(request.Specialization))
+            {
+                query = query.Where(d => d.Specialization.Contains(request.Specialization));
+            }
+
+            if (!string.IsNullOrEmpty(request.DocLicenseNum))
+            {
+                query = query.Where(d => d.DocLicenseNum.Contains(request.DocLicenseNum));
+            }
+
+            result.Value = await query
                 .OrderBy(d => d.DoctorId)
                 .GetPagedAsync(request.Page, request.PageSize);
 

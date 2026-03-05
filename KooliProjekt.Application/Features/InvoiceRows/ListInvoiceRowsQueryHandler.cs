@@ -39,8 +39,19 @@ namespace KooliProjekt.Application.Features.InvoiceRows
                 return result;
             }
 
-            result.Value = await _dbContext
-                .InvoiceRows
+            var query = _dbContext.InvoiceRows.AsQueryable();
+
+            if (request.InvoiceId.HasValue)
+            {
+                query = query.Where(r => r.InvoiceId == request.InvoiceId.Value);
+            }
+
+            if (!string.IsNullOrEmpty(request.ServiceDescription))
+            {
+                query = query.Where(r => r.ServiceDescription.Contains(request.ServiceDescription));
+            }
+
+            result.Value = await query
                 .OrderBy(r => r.InvoiceRowId)
                 .GetPagedAsync(request.Page, request.PageSize);
 

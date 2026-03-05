@@ -39,8 +39,14 @@ namespace KooliProjekt.Application.Features.Clients
                 return result;
             }
 
-            result.Value = await _dbContext
-                .Clients
+            var query = _dbContext.Clients.AsQueryable();
+
+            if (!string.IsNullOrEmpty(request.PersonalCode))
+            {
+                query = query.Where(c => c.PersonalCode.Contains(request.PersonalCode));
+            }
+
+            result.Value = await query
                 .OrderBy(c => c.ClientId)
                 .GetPagedAsync(request.Page, request.PageSize);
 

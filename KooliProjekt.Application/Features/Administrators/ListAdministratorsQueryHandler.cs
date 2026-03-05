@@ -18,13 +18,19 @@ namespace KooliProjekt.Application.Features.Administrators
 
         public ListAdministratorsQueryHandler(ApplicationDbContext dbContext)
         {
-            if (dbContext == null) throw new ArgumentNullException(nameof(dbContext));
+            if (dbContext == null)
+            {
+                throw new ArgumentNullException(nameof(dbContext));
+            }
             _dbContext = dbContext;
         }
 
         public async Task<OperationResult<PagedResult<Administrator>>> Handle(ListAdministratorsQuery request, CancellationToken cancellationToken)
         {
-            if (request == null) throw new ArgumentNullException(nameof(request));
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
 
             var result = new OperationResult<PagedResult<Administrator>>();
 
@@ -33,8 +39,14 @@ namespace KooliProjekt.Application.Features.Administrators
                 return result;
             }
 
-            result.Value = await _dbContext
-                .Administrators
+            var query = _dbContext.Administrators.AsQueryable();
+
+            if (!string.IsNullOrEmpty(request.Department))
+            {
+                query = query.Where(a => a.Department.Contains(request.Department));
+            }
+
+            result.Value = await query
                 .OrderBy(a => a.AdminId)
                 .GetPagedAsync(request.Page, request.PageSize);
 

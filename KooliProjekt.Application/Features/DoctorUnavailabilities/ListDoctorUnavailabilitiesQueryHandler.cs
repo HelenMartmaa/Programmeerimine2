@@ -39,8 +39,24 @@ namespace KooliProjekt.Application.Features.DoctorUnavailabilities
                 return result;
             }
 
-            result.Value = await _dbContext
-                .DoctorUnavailabilities
+            var query = _dbContext.DoctorUnavailabilities.AsQueryable();
+
+            if (request.DoctorId.HasValue)
+            {
+                query = query.Where(u => u.DoctorId == request.DoctorId.Value);
+            }
+
+            if (request.DateFrom.HasValue)
+            {
+                query = query.Where(u => u.StartDate >= request.DateFrom.Value);
+            }
+
+            if (request.DateTo.HasValue)
+            {
+                query = query.Where(u => u.EndDate <= request.DateTo.Value);
+            }
+
+            result.Value = await query
                 .OrderBy(u => u.DoctorId)
                 .GetPagedAsync(request.Page, request.PageSize);
 

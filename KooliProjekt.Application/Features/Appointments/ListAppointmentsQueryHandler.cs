@@ -39,8 +39,34 @@ namespace KooliProjekt.Application.Features.Appointments
                 return result;
             }
 
-            result.Value = await _dbContext
-                .Appointments
+            var query = _dbContext.Appointments.AsQueryable();
+
+            if (request.ClientId.HasValue)
+            {
+                query = query.Where(a => a.ClientId == request.ClientId.Value);
+            }
+
+            if (request.DoctorId.HasValue)
+            {
+                query = query.Where(a => a.DoctorId == request.DoctorId.Value);
+            }
+
+            if (request.Status.HasValue)
+            {
+                query = query.Where(a => a.Status == request.Status.Value);
+            }
+
+            if (request.DateFrom.HasValue)
+            {
+                query = query.Where(a => a.AppointmentDateTime >= request.DateFrom.Value);
+            }
+
+            if (request.DateTo.HasValue)
+            {
+                query = query.Where(a => a.AppointmentDateTime <= request.DateTo.Value);
+            }
+
+            result.Value = await query
                 .OrderBy(a => a.AppointmentId)
                 .GetPagedAsync(request.Page, request.PageSize);
 

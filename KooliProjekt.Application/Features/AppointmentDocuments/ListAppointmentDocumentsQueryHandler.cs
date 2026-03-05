@@ -39,8 +39,19 @@ namespace KooliProjekt.Application.Features.AppointmentDocuments
                 return result;
             }
 
-            result.Value = await _dbContext
-                .AppointmentDocuments
+            var query = _dbContext.AppointmentDocuments.AsQueryable();
+
+            if (!string.IsNullOrEmpty(request.DocumentType))
+            {
+                query = query.Where(d => d.DocumentType.Contains(request.DocumentType));
+            }
+
+            if (!string.IsNullOrEmpty(request.FileName))
+            {
+                query = query.Where(d => d.FileName.Contains(request.FileName));
+            }
+
+            result.Value = await query
                 .OrderBy(d => d.DocumentId)
                 .GetPagedAsync(request.Page, request.PageSize);
 
