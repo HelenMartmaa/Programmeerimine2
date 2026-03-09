@@ -1,5 +1,6 @@
 using System;
 using System.Net;
+using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using KooliProjekt.Application.Data;
@@ -52,5 +53,71 @@ namespace KooliProjekt.IntegrationTests
             Assert.NotNull(response);
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
+
+		[Fact]
+		public async Task Save_should_create_new_doctor()
+		{
+			var user = new User { Email = "doctor@test.com", PasswordHash = "hash", FirstName = "Doctor", LastName = "User", PhoneNumber = "12345678" };
+			await DbContext.Users.AddAsync(user);
+			await DbContext.SaveChangesAsync();
+
+			var command = new { DoctorId = 0, UserId = user.UserId, Specialization = "General", DocLicenseNum = "LIC001", WorkingHoursStart = "08:00:00", WorkingHoursEnd = "16:00:00" };
+			var response = await Client.PostAsJsonAsync("/api/Doctors/Save", command);
+
+			Assert.NotNull(response);
+			Assert.True(response.IsSuccessStatusCode);
+		}
+
+		[Fact]
+		public async Task Save_should_update_existing_doctor()
+		{
+			var user = new User { Email = "doctor@test.com", PasswordHash = "hash", FirstName = "Doctor", LastName = "User", PhoneNumber = "12345678" };
+			await DbContext.Users.AddAsync(user);
+			await DbContext.SaveChangesAsync();
+
+			var doctor = new Doctor { UserId = user.UserId, Specialization = "General", DocLicenseNum = "LIC001" };
+			await DbContext.Doctors.AddAsync(doctor);
+			await DbContext.SaveChangesAsync();
+
+			var command = new { DoctorId = doctor.DoctorId, UserId = user.UserId, Specialization = "Cardiology", DocLicenseNum = "LIC002", WorkingHoursStart = "09:00:00", WorkingHoursEnd = "17:00:00" };
+			var response = await Client.PostAsJsonAsync("/api/Doctors/Save", command);
+
+			Assert.NotNull(response);
+			Assert.True(response.IsSuccessStatusCode);
+		}
+
+		[Fact]
+		public async Task Delete_should_delete_existing_doctor()
+		{
+			var user = new User { Email = "doctor@test.com", PasswordHash = "hash", FirstName = "Doctor", LastName = "User", PhoneNumber = "12345678" };
+			await DbContext.Users.AddAsync(user);
+			await DbContext.SaveChangesAsync();
+
+			var doctor = new Doctor { UserId = user.UserId, Specialization = "General", DocLicenseNum = "LIC001" };
+			await DbContext.Doctors.AddAsync(doctor);
+			await DbContext.SaveChangesAsync();
+
+			var request = new HttpRequestMessage(HttpMethod.Delete, "/api/Doctors/Delete")
+			{
+				Content = JsonContent.Create(new { Id = doctor.DoctorId })
+			};
+			var response = await Client.SendAsync(request);
+
+			Assert.NotNull(response);
+			Assert.True(response.IsSuccessStatusCode);
+		}
+
+		[Fact]
+		public async Task Delete_should_return_error_for_missing_doctor()
+		{
+			var request = new HttpRequestMessage(HttpMethod.Delete, "/api/Doctors/Delete")
+			{
+				Content = JsonContent.Create(new { Id = 99999 })
+			};
+			var response = await Client.SendAsync(request);
+
+			Assert.NotNull(response);
+			Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+		}
     }
 }

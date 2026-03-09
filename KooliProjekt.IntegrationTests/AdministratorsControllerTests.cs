@@ -1,5 +1,6 @@
 using System;
 using System.Net;
+using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using KooliProjekt.Application.Data;
@@ -66,5 +67,89 @@ namespace KooliProjekt.IntegrationTests
             Assert.NotNull(response);
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
+
+		[Fact]
+		public async Task Save_should_create_new_administrator()
+		{
+			// Arrange
+			var user = new User { Email = "admin@test.com", PasswordHash = "hash", FirstName = "Admin", LastName = "User", PhoneNumber = "12345678" };
+			await DbContext.Users.AddAsync(user);
+			await DbContext.SaveChangesAsync();
+
+			var command = new { AdminId = 0, UserId = user.UserId, Department = "IT" };
+
+			// Act
+			var response = await Client.PostAsJsonAsync("/api/Administrators/Save", command);
+
+			// Assert
+			Assert.NotNull(response);
+			Assert.True(response.IsSuccessStatusCode);
+		}
+
+		[Fact]
+		public async Task Save_should_update_existing_administrator()
+		{
+			// Arrange
+			var user = new User { Email = "admin@test.com", PasswordHash = "hash", FirstName = "Admin", LastName = "User", PhoneNumber = "12345678" };
+			await DbContext.Users.AddAsync(user);
+			await DbContext.SaveChangesAsync();
+
+			var administrator = new Administrator { UserId = user.UserId, Department = "IT" };
+			await DbContext.Administrators.AddAsync(administrator);
+			await DbContext.SaveChangesAsync();
+
+			var command = new { AdminId = administrator.AdminId, UserId = user.UserId, Department = "HR" };
+
+			// Act
+			var response = await Client.PostAsJsonAsync("/api/Administrators/Save", command);
+
+			// Assert
+			Assert.NotNull(response);
+			Assert.True(response.IsSuccessStatusCode);
+		}
+
+		[Fact]
+		public async Task Delete_should_delete_existing_administrator()
+		{
+			// Arrange
+			var user = new User { Email = "admin@test.com", PasswordHash = "hash", FirstName = "Admin", LastName = "User", PhoneNumber = "12345678" };
+			await DbContext.Users.AddAsync(user);
+			await DbContext.SaveChangesAsync();
+
+			var administrator = new Administrator { UserId = user.UserId, Department = "IT" };
+			await DbContext.Administrators.AddAsync(administrator);
+			await DbContext.SaveChangesAsync();
+
+			var command = new { Id = administrator.AdminId };
+
+			// Act
+			var request = new HttpRequestMessage(HttpMethod.Delete, "/api/Administrators/Delete")
+			{
+				Content = JsonContent.Create(command)
+			};
+			var response = await Client.SendAsync(request);
+
+			// Assert
+			Assert.NotNull(response);
+			Assert.True(response.IsSuccessStatusCode);
+		}
+
+		[Fact]
+		public async Task Delete_should_return_not_found_for_missing_administrator()
+		{
+			// Arrange
+			var command = new { Id = 99999 };
+
+			// Act
+			var request = new HttpRequestMessage(HttpMethod.Delete, "/api/Administrators/Delete")
+			{
+				Content = JsonContent.Create(command)
+			};
+			var response = await Client.SendAsync(request);
+
+			// Assert
+			Assert.NotNull(response);
+			Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+		}
     }
 }
